@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.io Client</title>
+  <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script> <!-- Include Socket.io client -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #messages {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 300px;
+      overflow-y: scroll;
+      margin-bottom: 10px;
+    }
+    #message-input {
+      width: 80%;
+      padding: 10px;
+    }
+    #send-btn {
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Socket.io Test Client</h2>
+  <div id="messages"></div>
+  <input type="text" id="message-input" placeholder="Enter message">
+  <button id="send-btn">Send</button>
+
+  <script>
+    const socket = io('http://localhost:3002'); // Adjust the URL if needed
+
+    // Connection established
+    socket.on('connect', () => {
+      console.log('Connected to Socket.io server');
+      addMessage('Connected to Socket.io server');
+    });
+
+    // Listen for messages from the server
+    socket.on('message', (data) => {
+      console.log('Message received:', data);
+      addMessage(` ${data}`);
+    });
+
+    // Disconnected from server
+    socket.on('disconnect', () => {
+      console.log('Disconnected from Socket.io server');
+      addMessage('Disconnected from Socket.io server');
+    });
+
+    // Handle send button click
+    document.getElementById('send-btn').onclick = function () {
+        const message = document.getElementById('message-input').value;
+        console.log(message);
+      if (message) {
+        socket.emit('message', message); // Send message to the server
+        addMessage(`You: ${message}`);
+        document.getElementById('message-input').value = '';
+      }
+    };
+
+    // Add message to the chat box
+    function addMessage(message) {
+      const messagesDiv = document.getElementById('messages');
+      const newMessage = document.createElement('p');
+      newMessage.textContent = message;
+      messagesDiv.appendChild(newMessage);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+  </script>
+</body>
+</html>
